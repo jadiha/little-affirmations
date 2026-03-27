@@ -2,8 +2,6 @@
 
 A cozy, cottagecore affirmation card website. Tap anywhere to draw a card — each one features a tiny animal character with a poetic, story-driven message for your day.
 
-**[✦ Open the site](https://jadiha.github.io/little-affirmations/)**
-
 ---
 
 ## what it does
