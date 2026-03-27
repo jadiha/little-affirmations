@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>little affirmations ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #e8c97a;
+    --brown: #8b6650;
+    --soft-brown: #c4967a;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: radial-gradient(ellipse at 20% 20%, #fce8f3 0%, #f0e8fa 30%, #e8f0f8 60%, #e8f5ee 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lora', serif;
+    cursor: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+  }
+
+  /* ── Glitter cursor (desktop only) ── */
+  #cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #f9d4f5 60%, transparent 100%);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
+
+  @media (pointer: fine) {
+    #cursor { display: block; }
+    body { cursor: none; }
+  }
+
+  .sparkle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    animation: sparkle-fade 0.9s ease-out forwards;
+    line-height: 1;
+  }
+
+  @keyframes sparkle-fade {
+    0%   { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(0) rotate(180deg); }
+  }
+
+  /* ── Falling petals ── */
+  .petal {
+    position: fixed;
+    top: -2rem;
+    pointer-events: none;
+    z-index: 1;
+    font-size: 1rem;
+    opacity: 0;
+    animation: petal-fall linear infinite;
+  }
+
+  @keyframes petal-fall {
+    0%   { opacity: 0;   transform: translateY(0)    rotate(0deg)   translateX(0); }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.4; }
+    100% { opacity: 0;   transform: translateY(105vh) rotate(360deg) translateX(40px); }
+  }
+
+  /* ── Background blobs ── */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    animation: float-blob 12s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width:300px; height:300px; background:#f9cfe8; top:-60px; left:-60px; animation-delay:0s; }
+  .blob-2 { width:250px; height:250px; background:#c8e6f9; bottom:-40px; right:-40px; animation-delay:3s; }
+  .blob-3 { width:200px; height:200px; background:#d4f0d4; top:50%; left:60%; animation-delay:6s; }
+
+  @keyframes float-blob {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(20px,30px) scale(1.08); }
+  }
+
+  /* ── Stars ── */
+  .star {
+    position: fixed;
+    color: #e8c97a;
+    opacity: 0;
+    animation: twinkle 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0; transform: scale(0.5); }
+    50%     { opacity: 0.7; transform: scale(1.2); }
+  }
+
+  /* ── Counter ── */
+  #counter {
+    position: fixed;
+    top: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(0.6rem, 2.5vw, 0.75rem);
+    letter-spacing: 0.15em;
+    color: var(--soft-brown);
+    opacity: 0;
+    transition: opacity 0.6s;
+    text-align: center;
+    z-index: 10;
+    text-transform: uppercase;
+  }
+  #counter.visible { opacity: 0.65; }
+
+  /* ── Hint ── */
+  #hint {
+    position: fixed;
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(0.75rem, 3vw, 0.88rem);
+    color: var(--soft-brown);
+    letter-spacing: 0.05em;
+    opacity: 0.75;
+    animation: breathe 3s ease-in-out infinite;
+    text-align: center;
+    z-index: 10;
+    padding: 0 16px;
+  }
+  @keyframes breathe {
+    0%,100% { opacity: 0.5; }
+    50%     { opacity: 0.85; }
+  }
+
+  /* ── Card scene ── */
+  #card-scene {
+    perspective: 1000px;
+    z-index: 5;
+    /* responsive card sizing */
+    width:  min(260px, 72vw);
+    height: min(410px, 80dvh);
+  }
+
+  #card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #card-inner.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: 18px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Card back */
+  #card-back {
+    background: linear-gradient(145deg, #f5e6d3 0%, #ead5c4 50%, #f0ddd0 100%);
+    border: 3px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 40px rgba(139,102,80,0.2), inset 0 0 30px rgba(255,255,255,0.4);
+  }
+
+  .back-pattern {
+    position: absolute;
+    inset: 12px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(232,201,122,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .back-icon {
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    animation: float-icon 3s ease-in-out infinite;
+  }
+  @keyframes float-icon {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-8px); }
+  }
+
+  .back-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    letter-spacing: 0.2em;
+    color: var(--brown);
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  /* Card front */
+  #card-front {
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    border: 3px solid var(--gold);
+    overflow: hidden;
+    box-shadow: 0 16px 50px rgba(139,102,80,0.25), inset 0 0 30px rgba(255,255,255,0.5);
+  }
+
+  .card-header {
+    padding: clamp(14px,4vw,22px) 20px clamp(10px,3vw,14px);
+    text-align: center;
+  }
+
+  .card-roman {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+    letter-spacing: 0.3em;
+    color: var(--soft-brown);
+    opacity: 0.6;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .card-animal {
+    font-size: clamp(2.8rem, 9vw, 3.8rem);
+    line-height: 1;
+    display: block;
+    margin: 4px 0;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
+  }
+
+  .card-divider {
+    width: 80%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto;
+    opacity: 0.6;
+  }
+
+  .card-body {
+    flex: 1;
+    padding: clamp(10px,3vw,16px) clamp(16px,5vw,22px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+    font-weight: 600;
+    color: var(--brown);
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  .card-message {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(0.7rem, 2.5vw, 0.82rem);
+    color: #6b4f3a;
+    text-align: center;
+    line-height: 1.75;
+    opacity: 0.9;
+  }
+
+  .card-footer {
+    padding: 10px 20px clamp(12px,3vw,18px);
+    text-align: center;
+  }
+
+  .card-bottom-icon {
+    font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+    opacity: 0.5;
+    letter-spacing: 0.3em;
+  }
+
+  .corner {
+    position: absolute;
+    font-size: 0.7rem;
+    opacity: 0.4;
+    color: var(--brown);
+  }
+  .corner.tl { top: 8px; left: 10px; }
+  .corner.tr { top: 8px; right: 10px; }
+  .corner.bl { bottom: 8px; left: 10px; }
+  .corner.br { bottom: 8px; right: 10px; }
+
+  /* ── Deck-exhausted message ── */
+  #deck-msg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(253,246,238,0.95);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 28px 36px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: var(--brown);
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    line-height: 1.7;
+    box-shadow: 0 12px 40px rgba(139,102,80,0.2);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    max-width: 80vw;
+  }
+  #deck-msg.visible { opacity: 1; pointer-events: auto; }
+  #deck-msg .deck-emoji { font-size: 2rem; display: block; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div id="cursor"></div>
+<div id="counter"></div>
+<div id="hint">tap anywhere for your card ✨</div>
+
+<div id="deck-msg">
+  <span class="deck-emoji">🌿</span>
+  you've seen all 35 cards!<br>
+  <span style="font-style:italic;font-size:0.85em;opacity:0.75">tap to shuffle the deck and begin again</span>
+</div>
+
+<div id="card-scene">
+  <div id="card-inner">
+
+    <div class="card-face" id="card-back">
+      <div class="back-pattern">
+        <div class="back-icon">🌿</div>
+        <div class="back-title">little affirmations</div>
+        <div style="font-size:1.1rem;opacity:0.4;letter-spacing:0.4em">✦ ✦ ✦</div>
+      </div>
+    </div>
+
+    <div class="card-face" id="card-front">
+      <div class="corner tl">✦</div>
+      <div class="corner tr">✦</div>
+      <div class="corner bl">✦</div>
+      <div class="corner br">✦</div>
+      <div class="card-header">
+        <div class="card-roman" id="c-roman">I</div>
+        <span class="card-animal" id="c-animal">🐇</span>
+        <div class="card-divider"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-name" id="c-name">The Rabbit</div>
+        <div class="card-message" id="c-msg"></div>
+      </div>
+      <div class="card-footer">
+        <div class="card-bottom-icon" id="c-bottom">🌸 ✦ 🌸</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const ALL_CARDS = [
+  { roman:"I",      animal:"🐇", name:"The Little Rabbit",  bg:"linear-gradient(160deg,#fdf0f5,#fce4ec)", msg:"A small rabbit once trembled at the edge of a very big meadow — and then she hopped in anyway. You don't need to be fearless, sweet one. You just need to take one soft hop forward.", bottom:"🌸 ✦ 🌸" },
+  { roman:"II",     animal:"🦔", name:"The Hedgehog",        bg:"linear-gradient(160deg,#f0f4e8,#dcedc8)", msg:"The hedgehog curls up not because she is hiding, but because she is gathering herself. It is wise and wonderful to rest before you bloom again.", bottom:"🍄 ✦ 🍄" },
+  { roman:"III",    animal:"🦋", name:"The Butterfly",       bg:"linear-gradient(160deg,#f3e8fd,#e8d5f5)", msg:"She did not know she was becoming something extraordinary — she only knew she needed to be still for a while. Your quiet becoming is its own kind of magic.", bottom:"🌺 ✦ 🌺" },
+  { roman:"IV",     animal:"🐸", name:"The Frog",            bg:"linear-gradient(160deg,#e8f5e9,#c8e6c9)", msg:"He sat by the pond and watched the rain make rings in the water, perfectly content to simply be there. Today, being here is enough — you don't have to leap anywhere.", bottom:"🍃 ✦ 🍃" },
+  { roman:"V",      animal:"🦊", name:"The Fox",             bg:"linear-gradient(160deg,#fff3e0,#ffe0b2)", msg:"The little fox lost her way in the golden woods, but she found it again by following what felt warm. Your instincts are a kind of compass — trust them today.", bottom:"🍂 ✦ 🍂" },
+  { roman:"VI",     animal:"🐦", name:"The Blue Bird",       bg:"linear-gradient(160deg,#e3f2fd,#bbdefb)", msg:"She sings every single morning without wondering if anyone is listening — because the song is for her first. Let yourself make something today just because it fills your heart.", bottom:"☁️ ✦ ☁️" },
+  { roman:"VII",    animal:"🐌", name:"The Snail",           bg:"linear-gradient(160deg,#f9fbe7,#f0f4c3)", msg:"She carries her home on her back and goes at exactly her own pace. You are not behind — you are on a different, equally beautiful path.", bottom:"🌿 ✦ 🌿" },
+  { roman:"VIII",   animal:"🦉", name:"The Owl",             bg:"linear-gradient(160deg,#ede7f6,#d1c4e9)", msg:"The owl doesn't explain herself to those who sleep while she watches the moon. Your way of being in the world is wise, even when others don't understand it.", bottom:"🌙 ✦ 🌙" },
+  { roman:"IX",     animal:"🐝", name:"The Bee",             bg:"linear-gradient(160deg,#fffde7,#fff9c4)", msg:"She visits ten thousand flowers to make one jar of something sweet. Every small effort you are making is quietly gathering into something golden.", bottom:"🌼 ✦ 🌼" },
+  { roman:"X",      animal:"🐻", name:"The Bear",            bg:"linear-gradient(160deg,#efebe9,#d7ccc8)", msg:"He slept through the whole winter without apology, and woke up exactly when the world was ready for him. Rest is not laziness — it is you preparing for something wonderful.", bottom:"🍯 ✦ 🍯" },
+  { roman:"XI",     animal:"🦢", name:"The Swan",            bg:"linear-gradient(160deg,#fce4ec,#f8bbd0)", msg:"She was always graceful — even when she felt clumsy and unfinished and lost. You are more elegant than you see in your own reflection, darling.", bottom:"🌷 ✦ 🌷" },
+  { roman:"XII",    animal:"🐿️", name:"The Squirrel",       bg:"linear-gradient(160deg,#fff8e1,#ffecb3)", msg:"She buries little gifts for her future self without ever quite remembering where — and somehow the forest is richer for it. Every good thing you put into the world will find its way back.", bottom:"🌰 ✦ 🌰" },
+  { roman:"XIII",   animal:"🐢", name:"The Turtle",          bg:"linear-gradient(160deg,#e8f5e9,#b2dfdb)", msg:"She has seen more sunrises than almost anyone, and she is in no hurry at all. There is a deep and steady magic in you that does not need to rush.", bottom:"🪨 ✦ 🪨" },
+  { roman:"XIV",    animal:"🦝", name:"The Raccoon",         bg:"linear-gradient(160deg,#eceff1,#cfd8dc)", msg:"She finds treasure in places others have forgotten to look. Your curiosity is your greatest gift — keep poking around in the interesting corners of life.", bottom:"✨ ✦ ✨" },
+  { roman:"XV",     animal:"🐈", name:"The Cat",             bg:"linear-gradient(160deg,#fdf6ee,#f3e5d8)", msg:"She chose the warmest patch of sunlight and curled into it without a single regret. You are allowed to choose comfort, softness, and ease today.", bottom:"☀️ ✦ ☀️" },
+  { roman:"XVI",    animal:"🦜", name:"The Parrot",          bg:"linear-gradient(160deg,#e8f5e9,#f3e5f5)", msg:"She repeats the most beautiful things she has heard — not because she has no voice of her own, but because some words deserve to be said again and again. Tell yourself something kind today.", bottom:"🌴 ✦ 🌴" },
+  { roman:"XVII",   animal:"🐑", name:"The Lamb",            bg:"linear-gradient(160deg,#fafafa,#f0ede8)", msg:"She wanders the soft hills and somehow always finds her way home before dark. No matter how far you roam today, there is always a warm light waiting for you.", bottom:"🌾 ✦ 🌾" },
+  { roman:"XVIII",  animal:"🦦", name:"The Otter",           bg:"linear-gradient(160deg,#e0f7fa,#b2ebf2)", msg:"He floats on his back and holds his favourite things close to his chest while the river carries him gently along. It is okay to hold the things you love tightly today.", bottom:"💧 ✦ 💧" },
+  { roman:"XIX",    animal:"🦁", name:"The Lion Cub",        bg:"linear-gradient(160deg,#fff8e1,#ffe0b2)", msg:"She practices her roar every single day, even though it still sounds small. One day you will look back at this tender, trying time and know it was when everything began.", bottom:"🌻 ✦ 🌻" },
+  { roman:"XX",     animal:"🐙", name:"The Octopus",         bg:"linear-gradient(160deg,#ede7f6,#b3e5fc)", msg:"She has eight arms and uses every single one — tending to eight different dreams at once without dropping any. Your complexity is not too much. It is extraordinarily enough.", bottom:"🌊 ✦ 🌊" },
+  { roman:"XXI",    animal:"🐨", name:"The Koala",           bg:"linear-gradient(160deg,#f0f4f8,#d9e8d5)", msg:"She holds on to what she loves with her whole small body and doesn't let go until she is ready. You don't have to release anything before you are genuinely ready to.", bottom:"🌿 ✦ 🌿" },
+  { roman:"XXII",   animal:"🦙", name:"The Alpaca",          bg:"linear-gradient(160deg,#fdf6f0,#f5e6d3)", msg:"She has the most glorious, ridiculous, wonderful hair and she wears it with complete serenity. Your quirks are not flaws — they are the most interesting parts of you.", bottom:"🌾 ✦ 🌾" },
+  { roman:"XXIII",  animal:"🐧", name:"The Penguin",         bg:"linear-gradient(160deg,#e8eef5,#d0dff0)", msg:"He wobbles a little when he walks on land, but in the water he is absolute grace. You are in your element more often than you realise — keep going.", bottom:"❄️ ✦ ❄️" },
+  { roman:"XXIV",   animal:"🦩", name:"The Flamingo",        bg:"linear-gradient(160deg,#fce4ec,#f48fb1 80%)", msg:"She stands on one leg in the middle of everything and somehow makes it look easy. You are allowed to find your own balance, even if it looks unusual to everyone watching.", bottom:"🌸 ✦ 🌸" },
+  { roman:"XXV",    animal:"🐄", name:"The Cow",             bg:"linear-gradient(160deg,#f5f5f0,#e8f5e9)", msg:"She grazes in the meadow and finds the sweetest patches of grass without making it complicated. Today: find the small things that nourish you and simply enjoy them.", bottom:"🌼 ✦ 🌼" },
+  { roman:"XXVI",   animal:"🐺", name:"The Wolf",            bg:"linear-gradient(160deg,#ede7f6,#d1c4e9)", msg:"She howls at the moon not because she is lonely, but because it feels good to be fully heard. Let something out today — you have been carrying it quietly for long enough.", bottom:"🌕 ✦ 🌕" },
+  { roman:"XXVII",  animal:"🦅", name:"The Eagle",           bg:"linear-gradient(160deg,#e3f2fd,#e8eaf6)", msg:"From up high, she sees the whole picture — the river, the forest, the small road that connects them all. Step back today. The view from a little distance might change everything.", bottom:"⛅ ✦ ⛅" },
+  { roman:"XXVIII", animal:"🐬", name:"The Dolphin",         bg:"linear-gradient(160deg,#e0f7fa,#e8eaf6)", msg:"She leaps for no reason other than the pure joy of leaping. You are allowed — encouraged, even — to do something today purely because it delights you.", bottom:"🌊 ✦ 🌊" },
+  { roman:"XXIX",   animal:"🐘", name:"The Elephant",        bg:"linear-gradient(160deg,#f3e5f5,#e8eaf6)", msg:"She remembers everything — every kindness, every friend, every path through the tall grass. The love you have given has not been forgotten. It lives on in ways you cannot see.", bottom:"🌺 ✦ 🌺" },
+  { roman:"XXX",    animal:"🦒", name:"The Giraffe",         bg:"linear-gradient(160deg,#fffde7,#fff3e0)", msg:"She sees the fruit at the very top of the tree — the ones everyone else walks past. Your ability to see further than others is a gift, not a burden.", bottom:"🍃 ✦ 🍃" },
+  { roman:"XXXI",   animal:"🐍", name:"The Garden Snake",    bg:"linear-gradient(160deg,#e8f5e9,#f1f8e9)", msg:"She sheds her old skin and slithers into the new day without a second glance backwards. Letting go of who you were is how you become who you are meant to be.", bottom:"🌱 ✦ 🌱" },
+  { roman:"XXXII",  animal:"🐐", name:"The Mountain Goat",   bg:"linear-gradient(160deg,#f5f5f5,#e8f5e9)", msg:"She climbs the impossible rocks one tiny hoof-hold at a time, and she never slips. You are more sure-footed than you think — keep climbing.", bottom:"⛰️ ✦ ⛰️" },
+  { roman:"XXXIII", animal:"🦚", name:"The Peacock",         bg:"linear-gradient(160deg,#e8f5e9,#e8eaf6)", msg:"He unfurls every single feather and says: this is me, all of me, and I am not sorry for any of it. Today you are allowed to take up space and be seen.", bottom:"🌿 ✦ 🌿" },
+  { roman:"XXXIV",  animal:"🦔", name:"The Mole",            bg:"linear-gradient(160deg,#efebe9,#ede7f6)", msg:"She works quietly in the dark, tunnelling toward something she cannot yet see. Not all progress is visible — your underground work matters deeply.", bottom:"🍄 ✦ 🍄" },
+  { roman:"XXXV",   animal:"🦋", name:"The Firefly",         bg:"linear-gradient(160deg,#fffde7,#f3e5f5)", msg:"She carries her own light through the darkest parts of the night — small, steady, and impossible to miss. You don't need permission to shine. You already are.", bottom:"✨ ✦ ✨" },
+];
+
+// ── Shuffle deck (Fisher-Yates) ──
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let deck = shuffle(ALL_CARDS);
+let deckPos = 0;
+let isFlipped = false;
+let isAnimating = false;
+let deckExhausted = false;
+
+const inner    = document.getElementById('card-inner');
+const counter  = document.getElementById('counter');
+const hint     = document.getElementById('hint');
+const deckMsg  = document.getElementById('deck-msg');
+
+function nextCard() {
+  if (deckPos >= deck.length) return null;
+  return deck[deckPos++];
+}
+
+function updateCounter() {
+  if (deckPos === 0) { counter.classList.remove('visible'); return; }
+  counter.textContent = `${deckPos} of ${ALL_CARDS.length} cards drawn`;
+  counter.classList.add('visible');
+}
+
+function fillCard(card) {
+  document.getElementById('c-roman').textContent  = card.roman;
+  document.getElementById('c-animal').textContent = card.animal;
+  document.getElementById('c-name').textContent   = card.name;
+  document.getElementById('c-msg').textContent    = card.msg;
+  document.getElementById('c-bottom').textContent = card.bottom;
+  document.getElementById('card-front').style.background = card.bg;
+}
+
+function showCard() {
+  if (isAnimating) return;
+
+  // If deck exhausted — reshuffle on next tap
+  if (deckExhausted) {
+    deckMsg.classList.remove('visible');
+    deck = shuffle(ALL_CARDS);
+    deckPos = 0;
+    deckExhausted = false;
+    isFlipped = false;
+    inner.classList.remove('flipped');
+    hint.textContent = 'tap anywhere for your card ✨';
+    updateCounter();
+    return;
+  }
+
+  isAnimating = true;
+
+  if (!isFlipped) {
+    const card = nextCard();
+    fillCard(card);
+    inner.classList.add('flipped');
+    isFlipped = true;
+    updateCounter();
+    if (deckPos >= ALL_CARDS.length) {
+      hint.textContent = 'last card ✨';
+    } else {
+      hint.textContent = 'tap for another ✨';
+    }
+    setTimeout(() => { isAnimating = false; }, 750);
+  } else {
+    inner.classList.remove('flipped');
+    setTimeout(() => {
+      const card = nextCard();
+      if (!card) {
+        // Deck done
+        deckExhausted = true;
+        isFlipped = false;
+        hint.textContent = 'tap anywhere for your card ✨';
+        deckMsg.classList.add('visible');
+        isAnimating = false;
+        return;
+      }
+      fillCard(card);
+      inner.classList.add('flipped');
+      updateCounter();
+      if (deckPos >= ALL_CARDS.length) {
+        hint.textContent = 'last card ✨';
+      }
+      setTimeout(() => { isAnimating = false; }, 750);
+    }, 380);
+  }
+}
+
+// ── Touch / click handling (no double-fire) ──
+let lastTouch = 0;
+document.addEventListener('touchstart', e => {
+  lastTouch = Date.now();
+  const t = e.touches[0];
+  spawnBurst(t.clientX, t.clientY);
+  showCard();
+}, { passive: true });
+
+document.addEventListener('click', e => {
+  if (Date.now() - lastTouch < 400) return; // skip ghost click after touch
+  showCard();
+});
+
+// ── Glitter cursor (desktop) ──
+const cursorEl = document.getElementById('cursor');
+const colors = ['#f9c8e8','#fde68a','#c4b5fd','#a5f3d4','#fbcfe8','#fca5a5','#bfdbfe','#fff'];
+const shapes = ['✦','✧','⋆','✿','◦','•','❀','★'];
+let sparkleCount = 0;
+let lastSparkleTime = 0;
+
+document.addEventListener('mousemove', e => {
+  cursorEl.style.left = e.clientX + 'px';
+  cursorEl.style.top  = e.clientY + 'px';
+  const now = Date.now();
+  if (now - lastSparkleTime > 40) { // throttle
+    spawnSparkle(e.clientX, e.clientY);
+    lastSparkleTime = now;
+  }
+});
+
+document.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  spawnSparkle(t.clientX, t.clientY);
+}, { passive: true });
+
+function spawnSparkle(x, y) {
+  if (sparkleCount > 50) return;
+  sparkleCount++;
+  const el = document.createElement('div');
+  el.className = 'sparkle';
+  const size = 7 + Math.random() * 9;
+  el.style.cssText = `
+    left:${x + (Math.random()-0.5)*22}px;
+    top:${y + (Math.random()-0.5)*22}px;
+    font-size:${size}px;
+    color:${colors[Math.floor(Math.random()*colors.length)]};
+  `;
+  el.textContent = shapes[Math.floor(Math.random()*shapes.length)];
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => { el.remove(); sparkleCount--; });
+}
+
+function spawnBurst(x, y) {
+  for (let i = 0; i < 8; i++) spawnSparkle(x, y);
+}
+
+// ── Falling petals ──
+const petalEmojis = ['🌸','🌼','🍃','🌺','🌷','✿'];
+function createPetal() {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.textContent = petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.fontSize = (0.7 + Math.random() * 0.8) + 'rem';
+  p.style.opacity = '0';
+  const dur = 8 + Math.random() * 10;
+  const delay = Math.random() * 12;
+  p.style.animationDuration = dur + 's';
+  p.style.animationDelay = delay + 's';
+  document.body.appendChild(p);
+}
+for (let i = 0; i < 12; i++) createPetal();
+
+// ── Background twinkling stars ──
+for (let i = 0; i < 22; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.textContent = ['✦','✧','⋆','·'][Math.floor(Math.random()*4)];
+  s.style.left = Math.random() * 100 + 'vw';
+  s.style.top  = Math.random() * 100 + 'vh';
+  s.style.fontSize = (8 + Math.random()*10) + 'px';
+  s.style.animationDelay = (Math.random()*5) + 's';
+  s.style.animationDuration = (3 + Math.random()*4) + 's';
+  document.body.appendChild(s);
+}
+</script>
+</body>
+</html>
